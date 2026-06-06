@@ -5,7 +5,7 @@ if (localStorage.getItem('role') !== 'admin') {
 }
 let allProducts = []
 async function loadProducts() {
-    let response = await fetch('http://127.0.0.1:5000/products');
+    let response = await fetch('https://pagal-cart.onrender.com/products');
     allProducts = await response.json();
 
     
@@ -38,7 +38,7 @@ async function addproduct() {
         return;
     }
     
-    await fetch('http://127.0.0.1:5000/products', {
+    await fetch('https://pagal-cart.onrender.com/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, description: description, price: price, image: image })
@@ -54,7 +54,7 @@ async function addproduct() {
 }
 
 async function deleteproduct(id) {
-    await fetch(`http://127.0.0.1:5000/products/${id}`, {
+    await fetch(`https://pagal-cart.onrender.com/products/${id}`, {
         method: 'DELETE'
     });
     loadProducts();
@@ -91,7 +91,7 @@ async function saveProduct(id) {
         return;
     }
     
-    await fetch(`http://127.0.0.1:5000/products/${id}`, {
+    await fetch(`https://pagal-cart.onrender.com/products/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, description: description, price: price, image: image })

@@ -1,6 +1,6 @@
 async function loadcart() {
     let user_id = localStorage.getItem('user_id');
-    let response = await fetch(`http://127.0.0.1:5000/cart/${user_id}`);
+    let response = await fetch(`https://pagal-cart.onrender.com/cart/${user_id}`);
     let items = await response.json();
     let list = document.getElementById('cart-items');
     list.innerHTML = '';
@@ -27,14 +27,14 @@ async function loadcart() {
 }
 loadcart(); 
 async function removeItem(id) {
-    await fetch(`http://127.0.0.1:5000/cart/delete/${id}`, {
+    await fetch(`https://pagal-cart.onrender.com/cart/delete/${id}`, {
         method: 'DELETE'
     });
     loadcart();
 }
 async function checkout() {
     let user_id = localStorage.getItem('user_id');
-    let response = await fetch('http://127.0.0.1:5000/orders', {
+    let response = await fetch('https://pagal-cart.onrender.com/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user_id, total: 0 })
@@ -46,7 +46,7 @@ async function checkout() {
 }
 
 async function increaseQty(id) {
-    await fetch(`http://127.0.0.1:5000/cart/update/${id}`, {
+    await fetch(`https://pagal-cart.onrender.com/cart/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'increase' })
@@ -58,7 +58,7 @@ async function decreaseQty(id, quantity) {
     if (quantity === 1) {
         removeItem(id);
     } else {
-        await fetch(`http://127.0.0.1:5000/cart/update/${id}`, {
+        await fetch(`https://pagal-cart.onrender.com/cart/update/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'decrease' })
