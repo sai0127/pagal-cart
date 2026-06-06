@@ -1,0 +1,96 @@
+body {
+    font-family: Arial;
+    background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
+header{
+    background-color: #1a1a2e;
+    padding: 15px 30px;
+
+}
+main {
+    text-align: center;
+    padding: 100px 20px;
+    background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400');
+    background-size: cover;
+    background-position: center;
+    min-height: 80vh;
+}
+h1 {
+    font-size: 48px;
+    color: white;
+}
+p{
+    color: lightgrey;
+     font-size: 25px;
+}
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+}
+
+.login-btn {
+    background-color: #533483;
+}
+
+.signup-btn {
+    background-color: #e94560;
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 50px 20px;
+}
+
+.feature-box {
+    background-color: #16213e;
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 200px;
+    font-size: 18px;
+}
+.cta-btn {
+    background-color: #533483;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 18px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.cta-btn:hover {
+    background-color: #e94560;
+}
+@media (max-width: 768px) {
+    h1 {
+        font-size: 28px;
+    }
+    .features {
+        flex-direction: column;
+        align-items: center;
+    }
+}

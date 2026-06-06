@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <header>
+        <!-- logo -->
+        <nav>
+            <div class="logo">
+                <a href="/shop">Pagal Cart</a>
+            </div>
+            <button onclick="openModal()">+ Add Product</button>
+        </nav>
+    </header>
+        <div id="modal" style="display:none">
+            <div class="modal-content">
+                <!-- your inputs and button here -->
+                <h3> All Products</h3>
+                <input type="text" id="name" placeholder="name">
+                <input type="text" id="description" placeholder="description">
+                <input type="number" id="price" placeholder="price">
+                <input type="text" id="image" placeholder="image url">
+                <button id="modal-btn" onclick="addproduct()">Add Product</button>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+        </div>
+
+    <h2>All Products</h2>
+    <div id="products-list"></div>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>

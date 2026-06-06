@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Commerce</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <header>
+        <!-- logo -->
+        <nav>
+            <div class="logo">
+                <a href="/shop">Pagal Cart</a>
+            </div>
+            <!-- search bar -->
+            <div class="search-Container">
+                <input type="text" placeholder="Search Products">
+
+            </div>
+            <div class="nav-links">
+                <!-- cart icon -->
+                <a href="/cart" class="cart-icon">🛒</a>
+                <a href="/login.html" class="login-btn">Login</a>
+            </div>
+
+        </nav>
+    </header>
+    <h2>MyCart</h2>
+    <div id="cart-items"></div>
+    <div id="cart-total"></div>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+    <script src="/static/js/cart.js"></script>
+</body>
+</html>

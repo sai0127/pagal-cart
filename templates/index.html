@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Commerce</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <!-- header -->
+    
+    
+    <header>
+        <!-- logo -->
+        <nav>
+            <div class="logo">
+                <a>Pagal Cart</a>
+            </div>
+            <!-- search bar -->
+            <div class="search-Container">
+                <input type="text" id="search-input" placeholder="Search Products" oninput="searchProducts()">
+
+            </div>
+            <div class="nav-links">
+                <!-- cart icon -->
+                <a href="/cart" class="cart-icon">🛒</a>
+                <a href="/login" class="login-btn">Login</a>
+            </div>
+
+        </nav>
+    </header>
+    <!-- main content -->
+    <main>
+        <!-- products grid -->
+        <div id="products-grid">
+            <!-- product cards will load here from JS -->
+        </div>
+    </main>
+    <!-- footer -->
+    <footer>
+        <p>© 2026 BrandName. All rights reserved.</p>
+    </footer>
+
+    <script src="/static/js/index.js"></script>
+</body>
+</html>
