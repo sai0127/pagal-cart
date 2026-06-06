@@ -14,7 +14,7 @@ app.config['JWT_SECRET_KEY'] = 'your-secret-key'
 jwt = JWTManager(app)
 
 
-def get_db():app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+def get_db():
     conn = sqlite3.connect('ecommerce.db')
     conn.row_factory = sqlite3.Row
     return conn
