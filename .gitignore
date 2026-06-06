@@ -1,0 +1,8 @@
+*.db
+__pycache__/
+.vscode/
+app.py
+auc.py
+database.py
+learn_db.py
+notes_app.py
