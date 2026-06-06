@@ -28,13 +28,15 @@ async function login() {
     
     let data = await response.json();
     
-    if (data.token) {
+        if (data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user_id', 1);
         localStorage.setItem('role', data.role);
         alert("Login successful!");
-        window.location.href = '/shop';
-    } else {
-        alert(data.message);
+        if (data.role === 'admin') {
+            window.location.href = '/admin';
+        } else {
+            window.location.href = '/shop';
+        }
     }
 }

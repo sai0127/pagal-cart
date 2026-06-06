@@ -1,5 +1,7 @@
 from flask import render_template
 from flask import Flask,jsonify,request
+from flask import render_template, send_from_directory
+from datetime import timedelta
 from flask_cors import CORS
 import sqlite3
 import bcrypt
@@ -7,12 +9,12 @@ import bcrypt
 app = Flask(__name__)
 CORS(app)
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
 jwt = JWTManager(app)
 
 
-def get_db():
+def get_db():app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     conn = sqlite3.connect('ecommerce.db')
     conn.row_factory = sqlite3.Row
     return conn
