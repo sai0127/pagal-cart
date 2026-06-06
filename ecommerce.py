@@ -276,7 +276,7 @@ def seed_products():
     cursor.execute('SELECT COUNT(*) FROM products')
     count = cursor.fetchone()[0]
     
-    if count == 20:
+    if count == 0:
         products = [
             ('iPhone 15', 'Latest Apple smartphone with A16 chip', 79999, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400'),
             ('iPhone 16', 'Latest Apple smartphone with A18 chip', 89999, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400'),
