@@ -270,7 +270,24 @@ def get_users():
     db.close()
     return jsonify([dict(user) for user in users])
 
+def seed_products():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT COUNT(*) FROM products')
+    count = cursor.fetchone()[0]
+    
+    if count == 0:
+        products = [
+            ('iPhone 15', 'Latest Apple smartphone', 79999, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400'),
+            ('MacBook Air', 'Thin and light laptop with M2 chip', 114999, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400'),
+            ('Samsung Galaxy S24', 'Flagship Android smartphone', 74999, 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400'),
+            ('Sony Headphones', 'Premium wireless headphones', 29999, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'),
+        ]
+        cursor.executemany('INSERT INTO products (name, description, price, image) VALUES (?,?,?,?)', products)
+        db.commit()
+    db.close()
 
+seed_products()
 
 if __name__ == '__main__':
     app.run(debug=True)
