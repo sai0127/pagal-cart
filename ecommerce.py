@@ -276,18 +276,32 @@ def seed_products():
     cursor.execute('SELECT COUNT(*) FROM products')
     count = cursor.fetchone()[0]
     
-    if count == 0:
+    if count < 20:
         products = [
-            ('iPhone 15', 'Latest Apple smartphone', 79999, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400'),
-            ('MacBook Air', 'Thin and light laptop with M2 chip', 114999, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400'),
+            ('iPhone 15', 'Latest Apple smartphone with A16 chip', 79999, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400'),
+            ('iPhone 16', 'Latest Apple smartphone with A18 chip', 89999, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400'),
+            ('MacBook Air M2', 'Thin and light laptop with M2 chip', 114999, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400'),
+            ('MacBook Pro M3', 'Professional laptop with M3 chip', 199999, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400'),
             ('Samsung Galaxy S24', 'Flagship Android smartphone', 74999, 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400'),
-            ('Sony Headphones', 'Premium wireless headphones', 29999, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'),
+            ('OnePlus 12', 'Fast charging flagship phone', 64999, 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400'),
+            ('Google Pixel 8', 'Best camera smartphone', 59999, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400'),
+            ('iPad Pro M2', 'Professional tablet with M2 chip', 89999, 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400'),
+            ('Samsung Galaxy Tab S9', 'Premium Android tablet', 64999, 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400'),
+            ('Sony WH-1000XM5', 'Premium noise cancelling headphones', 29999, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'),
+            ('Bose QuietComfort 45', 'Wireless noise cancelling headphones', 24999, 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400'),
+            ('AirPods Pro', 'Wireless noise cancelling earbuds', 24999, 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400'),
+            ('Apple Watch Series 9', 'Smartwatch with health tracking', 41999, 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400'),
+            ('Samsung Galaxy Watch 6', 'Android smartwatch with fitness tracking', 28999, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'),
+            ('Nike Air Max', 'Premium running shoes', 12999, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'),
+            ('Adidas Ultraboost', 'Comfortable running shoes', 14999, 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400'),
+            ('Dell XPS 15', 'High performance Windows laptop', 124999, 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400'),
+            ('HP Spectre x360', 'Premium 2 in 1 laptop', 134999, 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400'),
+            ('Logitech MX Master 3', 'Premium wireless mouse', 8999, 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400'),
+            ('Casio G-Shock', 'Rugged sports watch', 8999, 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400'),
         ]
         cursor.executemany('INSERT INTO products (name, description, price, image) VALUES (?,?,?,?)', products)
         db.commit()
     db.close()
-
-seed_products()
 
 if __name__ == '__main__':
     app.run(debug=True)
