@@ -7,7 +7,7 @@ async function loadcart() {
     
     items.forEach(item => {
         let div = document.createElement('div');
-        ddiv.className = 'cart-card';
+        div.className = 'cart-card';
         div.innerHTML = `
             <img src="${item.image}" alt="${item.name}">
             <div>
