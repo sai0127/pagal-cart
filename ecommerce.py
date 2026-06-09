@@ -92,7 +92,7 @@ def signup_page():
 def admin():
     return render_template('admin.html')
 
-@app.route('\dashboard')
+@app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
 
