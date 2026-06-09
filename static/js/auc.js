@@ -58,7 +58,7 @@ async function login() {
     
     if (data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user_id', 1);
+        localStorage.setItem('user_id', data.id);
         localStorage.setItem('role', data.role);
         localStorage.setItem('user_name', data.name);
         alert("Login successful!");

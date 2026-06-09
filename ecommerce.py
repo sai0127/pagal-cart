@@ -123,7 +123,7 @@ def login():
     
     if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password'].encode('utf-8')):
         token = create_access_token(identity=str(user['id']))
-        return jsonify({"message": "login successful!", "token": token,"role": user['role'], "name":user['name']})
+        return jsonify({"message": "login successful!", "token": token,"role": user['role'], "name":user['name'],"id":user['id']})
     else:
         return jsonify({"message": "invalid credentials"})
 
