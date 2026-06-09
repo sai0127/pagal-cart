@@ -92,6 +92,12 @@ def signup_page():
 def admin():
     return render_template('admin.html')
 
+@app.route('\dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+
+
 #sinup
 @app.route('/signup', methods=['POST'])
 def sinup():
@@ -117,7 +123,7 @@ def login():
     
     if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password'].encode('utf-8')):
         token = create_access_token(identity=str(user['id']))
-        return jsonify({"message": "login successful!", "token": token,"role": user['role']})
+        return jsonify({"message": "login successful!", "token": token,"role": user['role'], "name":user['name']})
     else:
         return jsonify({"message": "invalid credentials"})
 
@@ -313,5 +319,12 @@ def reset_products():
 
 reset_products()
 seed_products()
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)

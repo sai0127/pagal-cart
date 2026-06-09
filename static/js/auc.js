@@ -60,6 +60,7 @@ async function login() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user_id', 1);
         localStorage.setItem('role', data.role);
+        localStorage.setItem('user_name', data.name);
         alert("Login successful!");
         if (data.role === 'admin') {
             window.location.href = '/admin';

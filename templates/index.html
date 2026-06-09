@@ -20,9 +20,20 @@
 
             </div>
             <div class="nav-links">
-                <!-- cart icon -->
                 <a href="/cart" class="cart-icon">🛒</a>
-                <a href="/login" class="login-btn">Login</a>
+                
+                <!-- show when not logged in -->
+                <a href="/login" class="login-btn" id="login-link">Login</a>
+                
+                <!-- show when logged in -->
+                <div class="profile-container" id="profile-container" style="display:none">
+                    <span class="profile-icon" onclick="toggleDropdown()">👤</span>
+                    <div class="profile-dropdown" id="profile-dropdown" style="display:none">
+                        <p id="profile-name">Hi!</p>
+                        <a href="/dashboard">My Orders</a>
+                        <a onclick="logout()">Logout</a>
+                    </div>
+                </div>
             </div>
 
         </nav>

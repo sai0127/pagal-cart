@@ -82,3 +82,24 @@ async function searchProducts() {
         list.appendChild(div);
     });
 }
+// check login status
+function checkLogin() {
+    if (localStorage.getItem('token')) {
+        document.getElementById('login-link').style.display = 'none';
+        document.getElementById('profile-container').style.display = 'block';
+        document.getElementById('profile-name').innerText = 'Hi, ' + localStorage.getItem('user_name') + '!';
+    }
+}
+
+function toggleDropdown() {
+    let dropdown = document.getElementById('profile-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function logout() {
+    localStorage.clear();
+    window.location.href = '/';
+}
+
+// call at bottom
+checkLogin();

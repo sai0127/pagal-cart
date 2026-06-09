@@ -209,3 +209,45 @@ footer {
 .checkout-btn:hover {
     background-color: #e94560;
 }
+/* profile dropdown */
+.profile-container {
+    position: relative;
+}
+
+.profile-icon {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.profile-dropdown {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    min-width: 150px;
+    z-index: 200;
+}
+
+.profile-dropdown p {
+    color: #1a1a2e;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.profile-dropdown a {
+    display: block;
+    color: #333;
+    text-decoration: none;
+    padding: 8px 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-dropdown a:hover {
+    color: #533483;
+}
