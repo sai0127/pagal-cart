@@ -317,6 +317,22 @@ def get_users():
     db.close()
     return jsonify([dict(user) for user in users])
 
+@app.route('/stats', methods=['GET'])
+def get_stats():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT COUNT(*) FROM products')
+    products = cursor.fetchone()[0]
+    cursor.execute('SELECT COUNT(*) FROM users')
+    users = cursor.fetchone()[0]
+    cursor.execute('SELECT COUNT(*) FROM orders')
+    orders = cursor.fetchone()[0]
+    db.close()
+    return jsonify({"products": products, "users": users, "orders": orders})
+
+
+
+
 def seed_products():
     db = get_db()
     cursor = db.cursor()

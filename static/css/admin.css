@@ -170,6 +170,35 @@ h2 {
     cursor: pointer;
     margin: 3px;
 }
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 30px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px 50px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-card h3 {
+    color: #1a1a2e;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    color: #533483;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+
+
 @media (max-width: 768px) {
     #products-list {
         grid-template-columns: repeat(2, 1fr);

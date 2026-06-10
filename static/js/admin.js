@@ -107,3 +107,13 @@ async function saveProduct(id) {
     loadProducts();
 }
 loadProducts()
+async function loadStats() {
+    let response = await fetch('https://pagal-cart.onrender.com/stats');
+    let stats = await response.json();
+    
+    document.getElementById('total-products').innerText = stats.products;
+    document.getElementById('total-users').innerText = stats.users;
+    document.getElementById('total-orders').innerText = stats.orders;
+}
+
+loadStats();
