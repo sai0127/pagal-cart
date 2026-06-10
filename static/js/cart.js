@@ -34,15 +34,37 @@ async function removeItem(id) {
 }
 async function checkout() {
     let user_id = localStorage.getItem('user_id');
+    
+    // get cart items first
+    let cartResponse = await fetch(`https://pagal-cart.onrender.com/cart/${user_id}`);
+    let cartItems = await cartResponse.json();
+    
+    if (cartItems.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+    
+    // calculate total
+    let total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // place order with items
     let response = await fetch('https://pagal-cart.onrender.com/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user_id, total: 0 })
+        body: JSON.stringify({ 
+            user_id: user_id, 
+            total: total,
+            items: cartItems.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+                price: item.price
+            }))
+        })
     });
+    
     let data = await response.json();
-    alert("Order placed!");
-    window.location.href = '/shop';
-   
+    alert('Order placed successfully!');
+    window.location.href = '/dashboard';
 }
 
 async function increaseQty(id) {

@@ -63,6 +63,15 @@ def create_table():
             date TEXT
         )
     ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS order_items (
+        id INTEGER PRIMARY KEY,
+        order_id INTEGER,
+        product_id INTEGER,
+        quantity INTEGER,
+        price REAL
+        )
+    ''')
     db.commit()
     db.close()
 create_table()
@@ -201,16 +210,29 @@ def delete_cart(id):
     return jsonify({"messsage":"item removed"})
 
 #place an order
-@app.route('/orders',methods=['POST'])
+#place an order
+@app.route('/orders', methods=['POST'])
 def place_order():
     data = request.json
     db = get_db()
-    cursor=db.cursor()
-    cursor.execute('INSERT INTO orders(user_id,total) VALUES (?,?)',
-                   (data['user_id'],data['total']))
+    cursor = db.cursor()
+    
+    # create order
+    cursor.execute('INSERT INTO orders(user_id, total) VALUES (?,?)',
+                   (data['user_id'], data['total']))
+    order_id = cursor.lastrowid
+    
+    # save each cart item to order_items
+    for item in data['items']:
+        cursor.execute('INSERT INTO order_items(order_id, product_id, quantity, price) VALUES (?,?,?,?)',
+                       (order_id, item['product_id'], item['quantity'], item['price']))
+    
+    # clear cart after order
+    cursor.execute('DELETE FROM cart WHERE user_id=?', (data['user_id'],))
+    
     db.commit()
     db.close()
-    return jsonify({"message":"placed an order"})
+    return jsonify({"message": "order placed!"})
 
 
 #get all orders from a user
@@ -258,6 +280,23 @@ def update_product(id):
     db.commit()
     db.close()
     return jsonify({"message": "product updated"})
+
+@app.route('/order-items/<order_id>', methods=['GET'])
+def get_order_items(order_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('''
+        SELECT order_items.quantity, order_items.price,
+               products.name, products.image
+        FROM order_items
+        JOIN products ON order_items.product_id = products.id
+        WHERE order_items.order_id = ?
+    ''', (order_id,))
+    items = cursor.fetchall()
+    db.close()
+    return jsonify([dict(item) for item in items])
+
+
 
 @app.route('/users/role/<id>', methods=['PUT'])
 def update_role(id):
@@ -317,7 +356,7 @@ def reset_products():
     db.commit()
     db.close()
 
-reset_products()
+
 seed_products()
 
 
