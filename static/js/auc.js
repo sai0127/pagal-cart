@@ -62,11 +62,7 @@ async function login() {
         localStorage.setItem('role', data.role);
         localStorage.setItem('user_name', data.name);
         alert("Login successful!");
-        if (data.role === 'admin') {
-            window.location.href = '/admin';
-        } else {
-            window.location.href = '/shop';
-        }
+        window.location.href = '/shop';
     } else {
         alert(data.message);
     }

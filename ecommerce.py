@@ -330,6 +330,10 @@ def get_stats():
     db.close()
     return jsonify({"products": products, "users": users, "orders": orders})
 
+@app.route('/admin-login')
+def admin_login_page():
+    return render_template('admin-login.html')
+
 
 
 
