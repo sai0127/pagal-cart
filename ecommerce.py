@@ -334,7 +334,20 @@ def get_stats():
 def admin_login_page():
     return render_template('admin-login.html')
 
+def seed_admin():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT COUNT(*) FROM users')
+    count = cursor.fetchone()[0]
+    
+    if count == 0:
+        hashed = bcrypt.hashpw('admin1234'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        cursor.execute('INSERT INTO users (name, email, password, role) VALUES (?,?,?,?)',
+                       ('Admin', 'admin@gmail.com', hashed, 'admin'))
+        db.commit()
+    db.close()
 
+seed_admin()
 
 
 def seed_products():
