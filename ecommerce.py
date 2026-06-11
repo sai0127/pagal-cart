@@ -346,6 +346,25 @@ def get_users():
     users = cursor.fetchall()
     db.close()
     return jsonify([dict(user) for user in users])
+# get all orders (admin)
+@app.route('/all-orders', methods=['GET'])
+def get_all_orders():
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('SELECT * FROM orders')
+    orders = cursor.fetchall()
+    db.close()
+    return jsonify([dict(order) for order in orders])
+
+# delete user
+@app.route('/users/<id>', methods=['DELETE'])
+def delete_user(id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('DELETE FROM users WHERE id = %s', (id,))
+    db.commit()
+    db.close()
+    return jsonify({"message": "user deleted"})
 
 # update user role
 @app.route('/users/role/<id>', methods=['PUT'])
@@ -358,7 +377,6 @@ def update_role(id):
     db.commit()
     db.close()
     return jsonify({"message": "role updated"})
-
 
 # ─── STATS ROUTE ───────────────────────────────────────────────────────────────
 

@@ -30,6 +30,26 @@
                 <p id="total-orders">0</p>
             </div>
         </div>
+    <!-- tabs -->
+        <div class="tabs">
+            <button onclick="showTab('products')" class="tab-btn active" id="tab-products">Products</button>
+            <button onclick="showTab('database')" class="tab-btn" id="tab-database">Database</button>
+        </div>
+
+        <!-- products section -->
+        <div id="products-section">
+            <h2>All Products</h2>
+            <div id="products-list"></div>
+        </div>
+
+        <!-- database section -->
+        <div id="database-section" style="display:none">
+            <h2>Users</h2>
+            <div id="users-list"></div>
+            <h2>Orders</h2>
+            <div id="orders-list"></div>
+        </div>
+
         <div id="modal" style="display:none">
             <div class="modal-content">
                 <!-- your inputs and button here -->
@@ -42,9 +62,6 @@
                 <button class="close-btn" onclick="closeModal()">✕</button>
             </div>
         </div>
-
-    <h2>All Products</h2>
-    <div id="products-list"></div>
     <script src="/static/js/admin.js"></script>
 </body>
 </html>

@@ -115,5 +115,65 @@ async function loadStats() {
     document.getElementById('total-users').innerText = stats.users;
     document.getElementById('total-orders').innerText = stats.orders;
 }
+function showTab(tab) {
+    document.getElementById('products-section').style.display = tab === 'products' ? 'block' : 'none';
+    document.getElementById('database-section').style.display = tab === 'database' ? 'block' : 'none';
+    document.getElementById('tab-products').classList.toggle('active', tab === 'products');
+    document.getElementById('tab-database').classList.toggle('active', tab === 'database');
+    
+    if (tab === 'database') {
+        loadUsers();
+        loadOrders();
+    }
+}
+
+async function loadUsers() {
+    let response = await fetch('https://pagal-cart.onrender.com/users');
+    let users = await response.json();
+    
+    let list = document.getElementById('users-list');
+    list.innerHTML = '';
+    
+    users.forEach(user => {
+        let div = document.createElement('div');
+        div.className = 'db-row';
+        div.innerHTML = `
+            <span>${user.id}</span>
+            <span>${user.name}</span>
+            <span>${user.email}</span>
+            <span class="role-badge">${user.role}</span>
+            <button class="delete-btn" onclick="deleteUser(${user.id})">Delete</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+async function loadOrders() {
+    let response = await fetch('https://pagal-cart.onrender.com/all-orders');
+    let orders = await response.json();
+    
+    let list = document.getElementById('orders-list');
+    list.innerHTML = '';
+    
+    orders.forEach(order => {
+        let div = document.createElement('div');
+        div.className = 'db-row';
+        div.innerHTML = `
+            <span>Order #${order.id}</span>
+            <span>User ID: ${order.user_id}</span>
+            <span>₹${order.total}</span>
+        `;
+        list.appendChild(div);
+    });
+}
+async function deleteUser(id) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        await fetch(`https://pagal-cart.onrender.com/users/${id}`, {
+            method: 'DELETE'
+        });
+        loadUsers();
+        loadStats();
+    }
+}
 
 loadStats();
