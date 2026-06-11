@@ -1,81 +1,99 @@
 from flask import render_template
-from flask import Flask,jsonify,request
+from flask import Flask, jsonify, request
 from flask import render_template, send_from_directory
 from datetime import timedelta
 from flask_cors import CORS
-import sqlite3
 import bcrypt
+import os
+import psycopg2
+import psycopg2.extras
 
 app = Flask(__name__)
 CORS(app)
+
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
 jwt = JWTManager(app)
 
 
+# ─── DATABASE CONNECTION ───────────────────────────────────────────────────────
+
 def get_db():
-    conn = sqlite3.connect('ecommerce.db')
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
     return conn
+
+def get_cursor(db):
+    return db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+
+# ─── CREATE TABLES ─────────────────────────────────────────────────────────────
 
 def create_table():
     db = get_db()
     cursor = db.cursor()
+
+    # users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             name TEXT,
             email TEXT,
             password TEXT,
             role TEXT DEFAULT 'user'
         )
     ''')
-    try:
-        cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'")
-        db.commit()
-    except:
-        pass
 
-
+    # products table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             name TEXT,
             description TEXT,
             price REAL,
             image TEXT
         )
     ''')
+
+    # cart table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS cart (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INTEGER,
             product_id INTEGER,
             quantity INTEGER
         )
     ''')
+
+    # orders table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             user_id INTEGER,
             total REAL,
             date TEXT
         )
     ''')
+
+    # order items table
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS order_items (
-        id INTEGER PRIMARY KEY,
-        order_id INTEGER,
-        product_id INTEGER,
-        quantity INTEGER,
-        price REAL
+        CREATE TABLE IF NOT EXISTS order_items (
+            id SERIAL PRIMARY KEY,
+            order_id INTEGER,
+            product_id INTEGER,
+            quantity INTEGER,
+            price REAL
         )
     ''')
+
     db.commit()
     db.close()
+
 create_table()
 
+
+# ─── PAGE ROUTES ───────────────────────────────────────────────────────────────
 
 @app.route('/')
 def landing():
@@ -105,257 +123,283 @@ def admin():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/admin-login')
+def admin_login_page():
+    return render_template('admin-login.html')
 
 
-#sinup
+# ─── AUTH ROUTES ───────────────────────────────────────────────────────────────
+
+# signup
 @app.route('/signup', methods=['POST'])
 def sinup():
     data = request.json
     hashed = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('INSERT INTO users (name,email,password) VALUES(?,?,?)',
-                   (data['name'],data['email'],hashed))
+    cursor = get_cursor(db)
+    cursor.execute('INSERT INTO users (name, email, password) VALUES (%s, %s, %s)',
+                   (data['name'], data['email'], hashed))
     db.commit()
     db.close()
-    return jsonify({"message":"user created"})
+    return jsonify({"message": "user created"})
 
-#login
+# login
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM users WHERE email = ?', (data['email'],))
+    cursor = get_cursor(db)
+    cursor.execute('SELECT * FROM users WHERE email = %s', (data['email'],))
     user = cursor.fetchone()
     db.close()
-    
+
     if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password'].encode('utf-8')):
         token = create_access_token(identity=str(user['id']))
-        return jsonify({"message": "login successful!", "token": token,"role": user['role'], "name":user['name'],"id":user['id']})
+        return jsonify({
+            "message": "login successful!",
+            "token": token,
+            "role": user['role'],
+            "name": user['name'],
+            "id": user['id']
+        })
     else:
         return jsonify({"message": "invalid credentials"})
 
 
-@app.route('/products',methods=['POST'])
+# ─── PRODUCT ROUTES ────────────────────────────────────────────────────────────
+
+# add product
+@app.route('/products', methods=['POST'])
 def add_product():
     data = request.json
-    db=get_db()
-    cursor = db.cursor()
-    cursor.execute('INSERT INTO products (name, description, price, image) VALUES(?,?,?,?)',
-               (data['name'], data['description'], data['price'], data['image']))
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('INSERT INTO products (name, description, price, image) VALUES (%s, %s, %s, %s)',
+                   (data['name'], data['description'], data['price'], data['image']))
     db.commit()
     db.close()
     return jsonify({"message": "product added"})
 
-#get all products
-@app.route('/products',methods=['GET'])
+# get all products
+@app.route('/products', methods=['GET'])
 def get_products():
-    db =get_db()
-    cursor=db.cursor()
-    cursor.execute('SELECT*FROM products')
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('SELECT * FROM products')
     products = cursor.fetchall()
     db.close()
     return jsonify([dict(product) for product in products])
 
-
-#cart route
-
-@app.route('/cart', methods=['POST'])
-def add_cart():
-    data = request.json
-    db = get_db()
-    cursor = db.cursor()
-    
-    # check if item already in cart
-    cursor.execute('SELECT * FROM cart WHERE user_id=? AND product_id=?',
-                   (data['user_id'], data['product_id']))
-    existing = cursor.fetchone()
-    
-    if existing:
-        # update quantity
-        cursor.execute('UPDATE cart SET quantity = quantity + 1 WHERE user_id=? AND product_id=?',
-                       (data['user_id'], data['product_id']))
-    else:
-        # insert new
-        cursor.execute('INSERT INTO cart(user_id,product_id,quantity) VALUES (?,?,?)',
-                       (data['user_id'], data['product_id'], data['quantity']))
-    
-    db.commit()
-    db.close()
-    return jsonify({"message": "item added to cart"})
-#get all cart items
-@app.route('/cart/<user_id>',methods=['GET'])
-def get_cart(user_id):
-    db=get_db()
-    cursor=db.cursor()
-    cursor.execute('''
-        SELECT cart.id, cart.quantity, products.name, products.price, products.image
-        FROM cart
-        JOIN products ON cart.product_id = products.id
-        WHERE cart.user_id = ?
-    ''', (user_id,))
-    cart = cursor.fetchall()
-    db.close()
-    return jsonify([dict(c) for c in cart])
-
-#remove item from cart
-@app.route('/cart/delete/<id>', methods=['DELETE'])
-def delete_cart(id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('DELETE FROM cart WHERE id=?',(id,))
-    db.commit()
-    db.close()
-    return jsonify({"messsage":"item removed"})
-
-#place an order
-#place an order
-@app.route('/orders', methods=['POST'])
-def place_order():
-    data = request.json
-    db = get_db()
-    cursor = db.cursor()
-    
-    # create order
-    cursor.execute('INSERT INTO orders(user_id, total) VALUES (?,?)',
-                   (data['user_id'], data['total']))
-    order_id = cursor.lastrowid
-    
-    # save each cart item to order_items
-    for item in data['items']:
-        cursor.execute('INSERT INTO order_items(order_id, product_id, quantity, price) VALUES (?,?,?,?)',
-                       (order_id, item['product_id'], item['quantity'], item['price']))
-    
-    # clear cart after order
-    cursor.execute('DELETE FROM cart WHERE user_id=?', (data['user_id'],))
-    
-    db.commit()
-    db.close()
-    return jsonify({"message": "order placed!"})
-
-
-#get all orders from a user
-@app.route('/orders/<user_id>',methods=['GET'])
-def get_orders(user_id):
-    db =get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM orders WHERE user_id =?',(user_id,))
-    orders = cursor.fetchall()
-    db.close()
-    return jsonify([dict(order) for order in orders])
-
-@app.route('/cart/update/<id>', methods=['PUT'])
-def update_qty(id):
-    data = request.json
-    db = get_db()
-    cursor = db.cursor()
-    
-    if data['action'] == 'increase':
-        cursor.execute('UPDATE cart SET quantity = quantity + 1 WHERE id = ?', (id,))
-    else:
-        cursor.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = ?', (id,))
-    
-    db.commit()
-    db.close()
-    return jsonify({"message": "quantity updated"})
-
-@app.route('/products/<id>', methods=['DELETE'])
-def delete_product(id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('DELETE FROM products WHERE id = ?', (id,))
-    db.commit()
-    db.close()
-    return jsonify({"message": "product deleted"})
-
-
+# update product
 @app.route('/products/<id>', methods=['PUT'])
 def update_product(id):
     data = request.json
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE products SET name=?, description=?, price=?, image=? WHERE id=?',
+    cursor = get_cursor(db)
+    cursor.execute('UPDATE products SET name=%s, description=%s, price=%s, image=%s WHERE id=%s',
                    (data['name'], data['description'], data['price'], data['image'], id))
     db.commit()
     db.close()
     return jsonify({"message": "product updated"})
 
+# delete product
+@app.route('/products/<id>', methods=['DELETE'])
+def delete_product(id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('DELETE FROM products WHERE id = %s', (id,))
+    db.commit()
+    db.close()
+    return jsonify({"message": "product deleted"})
+
+
+# ─── CART ROUTES ───────────────────────────────────────────────────────────────
+
+# add to cart
+@app.route('/cart', methods=['POST'])
+def add_cart():
+    data = request.json
+    db = get_db()
+    cursor = get_cursor(db)
+
+    # check if item already in cart
+    cursor.execute('SELECT * FROM cart WHERE user_id=%s AND product_id=%s',
+                   (data['user_id'], data['product_id']))
+    existing = cursor.fetchone()
+
+    if existing:
+        # update quantity
+        cursor.execute('UPDATE cart SET quantity = quantity + 1 WHERE user_id=%s AND product_id=%s',
+                       (data['user_id'], data['product_id']))
+    else:
+        # insert new item
+        cursor.execute('INSERT INTO cart(user_id, product_id, quantity) VALUES (%s, %s, %s)',
+                       (data['user_id'], data['product_id'], data['quantity']))
+
+    db.commit()
+    db.close()
+    return jsonify({"message": "item added to cart"})
+
+# get cart items for a user
+@app.route('/cart/<user_id>', methods=['GET'])
+def get_cart(user_id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('''
+        SELECT cart.id, cart.quantity, products.name, products.price, products.image
+        FROM cart
+        JOIN products ON cart.product_id = products.id
+        WHERE cart.user_id = %s
+    ''', (user_id,))
+    cart = cursor.fetchall()
+    db.close()
+    return jsonify([dict(c) for c in cart])
+
+# remove item from cart
+@app.route('/cart/delete/<id>', methods=['DELETE'])
+def delete_cart(id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('DELETE FROM cart WHERE id = %s', (id,))
+    db.commit()
+    db.close()
+    return jsonify({"message": "item removed"})
+
+# update cart quantity
+@app.route('/cart/update/<id>', methods=['PUT'])
+def update_qty(id):
+    data = request.json
+    db = get_db()
+    cursor = get_cursor(db)
+
+    if data['action'] == 'increase':
+        cursor.execute('UPDATE cart SET quantity = quantity + 1 WHERE id = %s', (id,))
+    else:
+        cursor.execute('UPDATE cart SET quantity = quantity - 1 WHERE id = %s', (id,))
+
+    db.commit()
+    db.close()
+    return jsonify({"message": "quantity updated"})
+
+
+# ─── ORDER ROUTES ──────────────────────────────────────────────────────────────
+
+# place an order
+@app.route('/orders', methods=['POST'])
+def place_order():
+    data = request.json
+    db = get_db()
+    cursor = get_cursor(db)
+
+    # create order and get order id
+    cursor.execute('INSERT INTO orders(user_id, total) VALUES (%s, %s) RETURNING id',
+                   (data['user_id'], data['total']))
+    order_id = cursor.fetchone()['id']
+
+    # save each cart item to order_items
+    for item in data['items']:
+        cursor.execute('INSERT INTO order_items(order_id, product_id, quantity, price) VALUES (%s, %s, %s, %s)',
+                       (order_id, item['product_id'], item['quantity'], item['price']))
+
+    # clear cart after order
+    cursor.execute('DELETE FROM cart WHERE user_id = %s', (data['user_id'],))
+
+    db.commit()
+    db.close()
+    return jsonify({"message": "order placed!"})
+
+# get all orders for a user
+@app.route('/orders/<user_id>', methods=['GET'])
+def get_orders(user_id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('SELECT * FROM orders WHERE user_id = %s', (user_id,))
+    orders = cursor.fetchall()
+    db.close()
+    return jsonify([dict(order) for order in orders])
+
+# get order items for an order
 @app.route('/order-items/<order_id>', methods=['GET'])
 def get_order_items(order_id):
     db = get_db()
-    cursor = db.cursor()
+    cursor = get_cursor(db)
     cursor.execute('''
         SELECT order_items.quantity, order_items.price,
                products.name, products.image
         FROM order_items
         JOIN products ON order_items.product_id = products.id
-        WHERE order_items.order_id = ?
+        WHERE order_items.order_id = %s
     ''', (order_id,))
     items = cursor.fetchall()
     db.close()
     return jsonify([dict(item) for item in items])
 
 
+# ─── USER ROUTES ───────────────────────────────────────────────────────────────
 
-@app.route('/users/role/<id>', methods=['PUT'])
-def update_role(id):
-    data = request.json
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE users SET role=? WHERE id=?',
-                   (data['role'], id))
-    db.commit()
-    db.close()
-    return jsonify({"message": "role updated"})
+# get all users
 @app.route('/users', methods=['GET'])
 def get_users():
     db = get_db()
-    cursor = db.cursor()
+    cursor = get_cursor(db)
     cursor.execute('SELECT id, name, email, role FROM users')
     users = cursor.fetchall()
     db.close()
     return jsonify([dict(user) for user in users])
 
+# update user role
+@app.route('/users/role/<id>', methods=['PUT'])
+def update_role(id):
+    data = request.json
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('UPDATE users SET role = %s WHERE id = %s',
+                   (data['role'], id))
+    db.commit()
+    db.close()
+    return jsonify({"message": "role updated"})
+
+
+# ─── STATS ROUTE ───────────────────────────────────────────────────────────────
+
+# get admin stats
 @app.route('/stats', methods=['GET'])
 def get_stats():
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT COUNT(*) FROM products')
-    products = cursor.fetchone()[0]
-    cursor.execute('SELECT COUNT(*) FROM users')
-    users = cursor.fetchone()[0]
-    cursor.execute('SELECT COUNT(*) FROM orders')
-    orders = cursor.fetchone()[0]
+    cursor = get_cursor(db)
+    cursor.execute('SELECT COUNT(*) as count FROM products')
+    products = cursor.fetchone()['count']
+    cursor.execute('SELECT COUNT(*) as count FROM users')
+    users = cursor.fetchone()['count']
+    cursor.execute('SELECT COUNT(*) as count FROM orders')
+    orders = cursor.fetchone()['count']
     db.close()
     return jsonify({"products": products, "users": users, "orders": orders})
 
-@app.route('/admin-login')
-def admin_login_page():
-    return render_template('admin-login.html')
 
+# ─── SEED DATA ─────────────────────────────────────────────────────────────────
+
+# seed admin user
 def seed_admin():
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT COUNT(*) FROM users')
-    count = cursor.fetchone()[0]
-    
+    cursor = get_cursor(db)
+    cursor.execute('SELECT COUNT(*) as count FROM users')
+    count = cursor.fetchone()['count']
+
     if count == 0:
         hashed = bcrypt.hashpw('admin1234'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        cursor.execute('INSERT INTO users (name, email, password, role) VALUES (?,?,?,?)',
+        cursor.execute('INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s)',
                        ('Admin', 'admin@gmail.com', hashed, 'admin'))
         db.commit()
     db.close()
 
-seed_admin()
-
-
+# seed products
 def seed_products():
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT COUNT(*) FROM products')
-    count = cursor.fetchone()[0]
-    
+    cursor = get_cursor(db)
+    cursor.execute('SELECT COUNT(*) as count FROM products')
+    count = cursor.fetchone()['count']
+
     if count == 0:
         products = [
             ('iPhone 15', 'Latest Apple smartphone with A16 chip', 79999, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400'),
@@ -379,23 +423,12 @@ def seed_products():
             ('Logitech MX Master 3', 'Premium wireless mouse', 8999, 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400'),
             ('Casio G-Shock', 'Rugged sports watch', 8999, 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400'),
         ]
-        cursor.executemany('INSERT INTO products (name, description, price, image) VALUES (?,?,?,?)', products)
+        cursor.executemany('INSERT INTO products (name, description, price, image) VALUES (%s, %s, %s, %s)', products)
         db.commit()
     db.close()
-def reset_products():
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('DELETE FROM products')
-    db.commit()
-    db.close()
 
-
+seed_admin()
 seed_products()
-
-
-
-
-
 
 
 if __name__ == '__main__':
