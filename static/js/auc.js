@@ -1,9 +1,9 @@
-async function signup() {
+async function sendOTP() {
     let name = document.getElementById('name').value;
     let email = document.getElementById('email').value;
     let password = document.getElementById('password').value;
 
-    // validations first
+    // validations
     if (name === '' || email === '' || password === '') {
         alert('please fill all fields');
         return;
@@ -17,20 +17,55 @@ async function signup() {
         return;
     }
 
-    // then fetch
+    // send OTP
+    let response = await fetch('https://pagal-cart.onrender.com/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    });
+    let data = await response.json();
+    
+    if (data.message === 'OTP sent!') {
+        alert('OTP sent to your email!');
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('otp-form').style.display = 'block';
+    } else {
+        alert('Failed to send OTP');
+    }
+}
+
+async function verifyAndSignup() {
+    let name = document.getElementById('name').value;
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+    let otp = document.getElementById('otp').value;
+
+    // verify OTP first
+    let otpResponse = await fetch('https://pagal-cart.onrender.com/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, otp: otp })
+    });
+    let otpData = await otpResponse.json();
+
+    if (!otpData.success) {
+        alert('Invalid OTP! Please try again');
+        return;
+    }
+
+    // create account
     let response = await fetch('https://pagal-cart.onrender.com/signup', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ name: name, email: email, password: password})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, password: password })
     });
     let data = await response.json();
     alert(data.message);
 
-    if(data.message == 'user created'){
-        window.location.href = '/login'
+    if (data.message === 'user created') {
+        window.location.href = '/login';
     }
 }
-
 
 async function login() {
     // get values first

@@ -7,7 +7,8 @@ import bcrypt
 import os
 import psycopg2
 import psycopg2.extras
-
+from flask_mail import Mail,Message
+import random
 app = Flask(__name__)
 CORS(app)
 
@@ -16,7 +17,13 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
 jwt = JWTManager(app)
-
+# mail config
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_EMAIL')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+mail = Mail(app)
 
 # ─── DATABASE CONNECTION ───────────────────────────────────────────────────────
 
@@ -93,7 +100,14 @@ def create_table():
             product_id INTEGER
         )
     ''')
-
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS otps (
+            id SERIAL PRIMARY KEY,
+            email TEXT,
+            otp TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     db.commit()
     db.close()
 
@@ -440,6 +454,64 @@ def delete_wishlist(id):
     db.close()
     return jsonify({"message": "removed from wishlist"})
 
+#----- Email Otp-------------------------------------
+# send OTP
+@app.route('/send-otp', methods=['POST'])
+def send_otp():
+    data = request.json
+    email = data['email']
+    otp = str(random.randint(100000, 999999))
+    
+    db = get_db()
+    cursor = get_cursor(db)
+    
+    # delete old OTP for this email
+    cursor.execute('DELETE FROM otps WHERE email = %s', (email,))
+    
+    # save new OTP
+    cursor.execute('INSERT INTO otps (email, otp) VALUES (%s, %s)', (email, otp))
+    db.commit()
+    db.close()
+    
+    # send email
+    msg = Message(
+        'Your Pagal Cart OTP',
+        sender=os.environ.get('MAIL_EMAIL'),
+        recipients=[email]
+    )
+    msg.body = f'''
+    Welcome to Pagal Cart! 🛒
+    
+    Your OTP is: {otp}
+    
+    This OTP is valid for 10 minutes.
+    Do not share this with anyone.
+    '''
+    mail.send(msg)
+    
+    return jsonify({"message": "OTP sent!"})
+
+# verify OTP
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp():
+    data = request.json
+    email = data['email']
+    otp = data['otp']
+    
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('SELECT * FROM otps WHERE email = %s AND otp = %s', (email, otp))
+    record = cursor.fetchone()
+    
+    if record:
+        # delete OTP after use
+        cursor.execute('DELETE FROM otps WHERE email = %s', (email,))
+        db.commit()
+        db.close()
+        return jsonify({"message": "OTP verified!", "success": True})
+    else:
+        db.close()
+        return jsonify({"message": "Invalid OTP!", "success": False})
 
 # ─── STATS ROUTE ───────────────────────────────────────────────────────────────
 
