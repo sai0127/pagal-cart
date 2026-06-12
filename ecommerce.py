@@ -127,6 +127,10 @@ def dashboard():
 def admin_login_page():
     return render_template('admin-login.html')
 
+@app.route('/address')
+def address_page():
+    return render_template('address.html')
+
 
 # ─── AUTH ROUTES ───────────────────────────────────────────────────────────────
 

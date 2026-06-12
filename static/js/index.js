@@ -57,7 +57,7 @@ async function buyNow(id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user_id, product_id: id, quantity: 1 })
     });
-    window.location.href = '/cart';
+    window.location.href = '/address';
 }
 async function searchProducts() {
     let query = document.getElementById('search-input').value.toLowerCase();
