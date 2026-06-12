@@ -16,6 +16,7 @@ async function loadProducts() {
             <img src="${product.image}" alt="${product.name}">
             <h3>${product.name}</h3>
             <p>₹${product.price}</p>
+            <button onclick="addToWishlist(${product.id})">❤️</button>
             <button onclick="addToCart(${product.id})">Add to Cart</button>
             <button onclick="buyNow(${product.id})">Buy Now</button>
         `;
