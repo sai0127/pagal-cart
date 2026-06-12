@@ -76,6 +76,7 @@ async function searchProducts() {
             <img src="${product.image}" alt="${product.name}">
             <h3>${product.name}</h3>
             <p>₹${product.price}</p>
+            <button onclick="addToWishlist(${product.id})">❤️</button>
             <button onclick="addToCart(${product.id})">Add to Cart</button>
             <button onclick="buyNow(${product.id})">Buy Now</button>
         `;
@@ -100,6 +101,17 @@ function logout() {
     localStorage.clear();
     window.location.href = '/';
 }
+async function addToWishlist(product_id) {
+    let user_id = localStorage.getItem('user_id');
+    let response = await fetch('https://pagal-cart.onrender.com/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user_id, product_id: product_id })
+    });
+    let data = await response.json();
+    alert(data.message);
+}
+
 
 // call at bottom
 checkLogin();

@@ -86,6 +86,13 @@ def create_table():
             price REAL
         )
     ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS wishlist (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER,
+            product_id INTEGER
+        )
+    ''')
 
     db.commit()
     db.close()
@@ -131,7 +138,9 @@ def admin_login_page():
 def address_page():
     return render_template('address.html')
 
-
+@app.route('/wishlist')
+def wishlist_page():
+    return render_template('wishlist.html')
 # ─── AUTH ROUTES ───────────────────────────────────────────────────────────────
 
 # signup
@@ -381,6 +390,56 @@ def update_role(id):
     db.commit()
     db.close()
     return jsonify({"message": "role updated"})
+
+
+# ───   WISHLIST ROUTES  ───────────────────────────────────────────────────────────────
+
+# add to wishlist
+@app.route('/wishlist', methods=['POST'])
+def add_wishlist():
+    data = request.json
+    db = get_db()
+    cursor = get_cursor(db)
+    
+    # check if already in wishlist
+    cursor.execute('SELECT * FROM wishlist WHERE user_id=%s AND product_id=%s',
+                   (data['user_id'], data['product_id']))
+    existing = cursor.fetchone()
+    
+    if existing:
+        return jsonify({"message": "already in wishlist"})
+    
+    cursor.execute('INSERT INTO wishlist(user_id, product_id) VALUES (%s, %s)',
+                   (data['user_id'], data['product_id']))
+    db.commit()
+    db.close()
+    return jsonify({"message": "added to wishlist"})
+
+# get wishlist for a user
+@app.route('/wishlist/<user_id>', methods=['GET'])
+def get_wishlist(user_id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('''
+        SELECT wishlist.id, products.name, products.price, products.image, products.id as product_id
+        FROM wishlist
+        JOIN products ON wishlist.product_id = products.id
+        WHERE wishlist.user_id = %s
+    ''', (user_id,))
+    items = cursor.fetchall()
+    db.close()
+    return jsonify([dict(item) for item in items])
+
+# remove from wishlist
+@app.route('/wishlist/<id>', methods=['DELETE'])
+def delete_wishlist(id):
+    db = get_db()
+    cursor = get_cursor(db)
+    cursor.execute('DELETE FROM wishlist WHERE id = %s', (id,))
+    db.commit()
+    db.close()
+    return jsonify({"message": "removed from wishlist"})
+
 
 # ─── STATS ROUTE ───────────────────────────────────────────────────────────────
 
