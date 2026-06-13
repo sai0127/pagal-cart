@@ -11,7 +11,10 @@
         <!-- input area -->
         
         <input type="email" id="email" placeholder="Enter Your Email">
-        <input type="password" id="password" placeholder="Enter Your Password">
+        <div class="password-container">
+            <input type="password" id="password" placeholder="Enter Your Password">
+            <span onclick="togglePassword('password')">👁️</span>
+        </div>
         
         <button onclick="login()">Login</button>
         
