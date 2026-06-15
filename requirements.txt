@@ -4,4 +4,3 @@ flask-jwt-extended
 bcrypt
 gunicorn
 psycopg2-binary
-flask-mail
