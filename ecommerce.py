@@ -14,9 +14,14 @@ import random
 app = Flask(__name__)
 CORS(app)
 
+# JWT config
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+jwt = JWTManager(app)
 
-
+# resend config
+import resend
 resend.api_key = os.environ.get('RESEND_API_KEY')
 # ─── DATABASE CONNECTION ───────────────────────────────────────────────────────
 
