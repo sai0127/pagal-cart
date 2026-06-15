@@ -1,30 +1,47 @@
 # Pagal Cart 🛒
 
-A full-stack e-commerce web application built with Python Flask, SQLite and vanilla JavaScript.
+A full-stack e-commerce web application built with Python Flask, PostgreSQL and vanilla JavaScript.
+
+## 🔗 Live Demo
+https://pagal-cart.onrender.com
 
 ## Features
-- User authentication (signup/login with JWT)
+- User authentication with OTP email verification
+- JWT token based sessions
 - Product listing with search
 - Shopping cart with quantity management
-- Admin panel to manage products
+- Wishlist
+- Address page for orders
+- Order history dashboard
+- Admin panel with product management
+- Database viewer in admin panel
 - Responsive design
+- PostgreSQL database
 
 ## Technologies Used
 - **Frontend:** HTML, CSS, JavaScript
 - **Backend:** Python Flask
-- **Database:** SQLite
-- **Authentication:** JWT, bcrypt
+- **Database:** PostgreSQL
+- **Authentication:** JWT, bcrypt, OTP via Resend
+- **Deployment:** Render
 
 ## How to Run
 1. Clone the repository
 2. Install dependencies:
-    pip install flask flask-cors flask-jwt-extended bcrypt
-3. Run the backend:
-    python ecommerce.py
-4. Open `landing.html` in browser
+   pip install -r requirements.txt
+3. Set environment variables:
+   - DATABASE_URL
+   - JWT_SECRET_KEY
+   - RESEND_API_KEY
+4. Run the backend:
+   python ecommerce.py
+5. Open browser at http://127.0.0.1:5000
 
 ## Pages
-- `landing.html` - Home/Landing page
-- `index.html` - Products page
-- `cart.html` - Shopping cart
-- `admin.html` - Admin panel (admin only)
+- `/` - Landing page
+- `/shop` - Products page
+- `/cart` - Shopping cart
+- `/dashboard` - User dashboard
+- `/wishlist` - Wishlist
+- `/admin` - Admin panel (admin only)
+- `/admin-login` - Admin login
