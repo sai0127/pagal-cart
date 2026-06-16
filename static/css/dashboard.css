@@ -108,3 +108,26 @@ h3 {
     font-weight: normal;
     margin: 2px 0;
 }
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #orders-list {
+        padding: 10px;
+    }
+    
+    .order-card {
+        flex-direction: column;
+    }
+    
+    .order-items {
+        flex-direction: column;
+    }
+    
+    .order-item {
+        width: 100%;
+    }
+}

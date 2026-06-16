@@ -71,3 +71,10 @@ button {
 button:hover {
     background-color: #e94560;
 }
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        padding: 25px;
+    }
+}
