@@ -1,31 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
 }
-header{
+
+header {
     background-color: #1a1a2e;
     padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
-}
-main {
-    text-align: center;
-    padding: 100px 20px;
-    background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400');
-    background-size: cover;
-    background-position: center;
-    min-height: 80vh;
-}
-h1 {
-    font-size: 48px;
-    color: white;
-}
-p{
-    color: lightgrey;
-     font-size: 25px;
-}
 nav {
     display: flex;
     justify-content: space-between;
@@ -55,22 +49,33 @@ nav {
     background-color: #e94560;
 }
 
-.features {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding: 50px 20px;
+main {
+    text-align: center;
+    padding: 100px 20px;
+    min-height: 80vh;
 }
 
-.feature-box {
-    background-color: #16213e;
+h1 {
+    font-size: 48px;
     color: white;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    width: 200px;
-    font-size: 18px;
+    margin-bottom: 15px;
 }
+
+p {
+    color: lightgrey;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.landing-btns {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
 .cta-btn {
     background-color: #533483;
     color: white;
@@ -79,58 +84,10 @@ nav {
     text-decoration: none;
     font-size: 18px;
     display: inline-block;
-    margin-top: 20px;
 }
 
 .cta-btn:hover {
     background-color: #e94560;
-}
-@media (max-width: 768px) {
-    h1 {
-        font-size: 28px;
-    }
-    .features {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-    
-    main {
-        padding: 60px 15px;
-    }
-    
-    h1 {
-        font-size: 28px;
-    }
-    
-    .features {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .feature-box {
-        width: 80%;
-    }
-    
-    .cta-btn {
-        padding: 12px 30px;
-        font-size: 16px;
-    }
-}
-.landing-btns {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
 }
 
 .login-landing-btn {
@@ -141,6 +98,12 @@ nav {
     border-radius: 25px;
     text-decoration: none;
     font-size: 18px;
+    display: inline-block;
+}
+
+.login-landing-btn:hover {
+    background-color: white;
+    color: #1a1a2e;
 }
 
 .demo-btn {
@@ -155,4 +118,72 @@ nav {
 
 .demo-btn:hover {
     background-color: #533483;
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+.feature-box {
+    background-color: rgba(22, 33, 62, 0.85);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 200px;
+    font-size: 18px;
+}
+
+footer {
+    background-color: #1a1a2e;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    main {
+        padding: 60px 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    p {
+        font-size: 16px;
+    }
+
+    .landing-btns {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cta-btn,
+    .login-landing-btn,
+    .demo-btn {
+        width: 80%;
+        text-align: center;
+    }
+
+    .features {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .feature-box {
+        width: 80%;
+    }
 }
