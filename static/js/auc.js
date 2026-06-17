@@ -107,3 +107,8 @@ function togglePassword(id) {
     let input = document.getElementById(id);
     input.type = input.type === 'password' ? 'text' : 'password';
 }
+function tryDemo() {
+    document.getElementById('email').value = 'demo@pagalcart.com';
+    document.getElementById('password').value = 'demo1234';
+    login();
+}

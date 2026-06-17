@@ -89,6 +89,30 @@ a:hover {
     cursor: pointer;
     font-size: 18px;
 }
+.demo-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: 2px dashed #533483;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #533483;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.demo-btn:hover {
+    background-color: #533483;
+    color: white;
+}
+
+.demo-note {
+    text-align: center;
+    color: #a0a0a0;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
 @media (max-width: 768px) {
     .container {
         width: 90%;
